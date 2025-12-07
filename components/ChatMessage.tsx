@@ -48,7 +48,7 @@ export default function ChatMessage({
         </div>
 
         {/* Timestamp & Actions */}
-        <div className="flex items-center justify-between mt-3 gap-4">
+        <div className="flex items-center justify-between mt-3 gap-4 min-h-[24px]">
           <span className="font-sans text-[10px] text-vintage-red/60 italic">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
@@ -56,33 +56,33 @@ export default function ChatMessage({
             })}
           </span>
 
-          {/* Action Buttons (Only for Bot) */}
+          {/* Action Buttons - ALWAYS VISIBLE NOW */}
           {isBot && !isStreaming && (
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-3 opacity-80 hover:opacity-100 transition-opacity">
               {onSave && (
                 <button
                   onClick={() => onSave(message.content)}
-                  className="p-1 hover:text-cherry-red transition-colors"
+                  className="p-1 text-vintage-red hover:text-cherry-red hover:bg-rose-quartz/20 rounded transition-all"
                   title="Save to Collection"
                 >
-                  <Heart className="w-3.5 h-3.5" />
+                  <Heart className="w-4 h-4 stroke-[1.5px]" />
                 </button>
               )}
               {onExport && (
                 <button
                   onClick={() => onExport(message.content)}
-                  className="p-1 hover:text-faded-gold transition-colors"
+                  className="p-1 text-faded-gold hover:text-sepia-dark hover:bg-faded-gold/10 rounded transition-all"
                   title="Export PDF"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-4 h-4 stroke-[1.5px]" />
                 </button>
               )}
               <button
                 onClick={() => navigator.clipboard.writeText(message.content)}
-                className="p-1 hover:text-sepia-dark transition-colors"
+                className="p-1 text-melancholy-blue hover:text-ink-black hover:bg-melancholy-blue/10 rounded transition-all"
                 title="Copy"
               >
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-4 h-4 stroke-[1.5px]" />
               </button>
             </div>
           )}

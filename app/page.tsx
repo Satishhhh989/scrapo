@@ -281,7 +281,7 @@ export default function HomePage() {
           </motion.header>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 scrollbar-vintage">
+          <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 space-y-4 scrollbar-vintage min-h-0">
             <AnimatePresence mode="popLayout">
               {messages.map((msg) => (
                 <ChatMessage
@@ -350,7 +350,7 @@ export default function HomePage() {
                 onKeyDown={handleKeyDown}
                 placeholder="Type your poetry prompt..."
                 disabled={isGenerating}
-                className="flex-1 px-3 md:px-4 py-2 md:py-3 bg-vintage-paper border-2 border-dusty-rose rounded-sm font-courier text-sm md:text-base text-ink-black placeholder:text-melancholy-blue/50 focus:outline-none focus:border-cherry-red transition-colors resize-none min-h-[50px] max-h-[150px] disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-vintage-paper/80 border border-dusty-rose/50 rounded-lg font-courier text-base text-ink-black placeholder:text-melancholy-blue/40 focus:outline-none focus:ring-1 focus:ring-vintage-red focus:border-transparent transition-all shadow-inner resize-none min-h-[50px] max-h-[150px] disabled:opacity-50"
                 rows={1}
               />
 
