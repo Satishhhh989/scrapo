@@ -223,10 +223,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-0 md:p-8">
+    <div className="h-[100dvh] w-full overflow-hidden flex items-center justify-center p-0 md:p-8">
       {/* Mobile: Full screen | Desktop: Polaroid container */}
       <motion.div
-        className="w-full h-screen md:h-auto md:max-h-[90vh] md:max-w-4xl md:border-2 md:border-dusty-rose md:shadow-polaroid md:rounded-sm overflow-hidden bg-old-paper/95 backdrop-blur-sm"
+        className="w-full h-full md:h-auto md:max-h-[90vh] md:max-w-4xl md:border-2 md:border-dusty-rose md:shadow-polaroid md:rounded-sm overflow-hidden bg-old-paper/95 backdrop-blur-sm flex flex-col"
         initial={{ opacity: 0, scale: 0.95, rotate: 0 }}
         animate={{ opacity: 1, scale: 1, rotate: window.innerWidth >= 768 ? -1 : 0 }}
         transition={{ duration: 0.8 }}
