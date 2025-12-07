@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar styling */
+@layer utilities {
+  .scrollbar-vintage::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-vintage::-webkit-scrollbar-track {
+    @apply bg-dusty-rose/10 rounded-sm;
+  }
+
+  .scrollbar-vintage::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-vintage-red to-faded-gold rounded-sm;
+  }
+
+  .scrollbar-vintage::-webkit-scrollbar-thumb:hover {
+    @apply from-cherry-red to-faded-gold;
+  }
+}
+
+/* Smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Text selection color */
+::selection {
+  @apply bg-rose-quartz text-ink-black;
+}
+
+/* Disable tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Better text rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom fade-out animation for loading screen */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
