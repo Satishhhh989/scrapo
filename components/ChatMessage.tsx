@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Message } from "@/lib/types";
-import { Copy, Download, Heart } from "lucide-react";
+import { Copy, Download, Heart, Share2 } from "lucide-react";
 import TypewriterText from "./Typewriter";
 
 interface ChatMessageProps {
@@ -10,6 +10,7 @@ interface ChatMessageProps {
   isStreaming?: boolean;
   onSave?: (content: string) => void;
   onExport?: (content: string) => void;
+  onShare?: (content: string) => void;
 }
 
 export default function ChatMessage({
@@ -17,6 +18,7 @@ export default function ChatMessage({
   isStreaming = false,
   onSave,
   onExport,
+  onShare,
 }: ChatMessageProps) {
   const isBot = message.role === "assistant";
 
@@ -59,6 +61,17 @@ export default function ChatMessage({
           {/* Action Buttons - ALWAYS VISIBLE NOW */}
           {isBot && !isStreaming && (
             <div className="flex gap-3 opacity-80 hover:opacity-100 transition-opacity">
+              {/* NEW SHARE BUTTON */}
+              {onShare && (
+                <button
+                  onClick={() => onShare(message.content)}
+                  className="p-1 text-faded-gold hover:text-sepia-dark hover:bg-faded-gold/10 rounded transition-all"
+                  title="Share Lyric Card"
+                >
+                  <Share2 className="w-4 h-4 stroke-[1.5px]" />
+                </button>
+              )}
+              
               {onSave && (
                 <button
                   onClick={() => onSave(message.content)}
@@ -71,7 +84,7 @@ export default function ChatMessage({
               {onExport && (
                 <button
                   onClick={() => onExport(message.content)}
-                  className="p-1 text-faded-gold hover:text-sepia-dark hover:bg-faded-gold/10 rounded transition-all"
+                  className="p-1 text-melancholy-blue hover:text-ink-black hover:bg-melancholy-blue/10 rounded transition-all"
                   title="Export PDF"
                 >
                   <Download className="w-4 h-4 stroke-[1.5px]" />

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Moon, Palette, BookOpen, Download, Loader2 } from "lucide-react";
+import { Send, Moon, Palette, BookOpen, Download, Loader2, Share2 } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -12,6 +12,7 @@ import { generateId } from "@/lib/utils";
 import { exportAsPDF } from "@/lib/exportUtils";
 import ChatMessage from "@/components/ChatMessage";
 import LoadingScreen from "@/components/LoadingScreen";
+import ShareModal from "@/components/ShareModal";
 
 export default function HomePage() {
   const router = useRouter();
@@ -29,6 +30,10 @@ export default function HomePage() {
   // Settings
   const [currentMood, setCurrentMood] = useState<MoodType>("melancholic");
   const [currentTheme, setCurrentTheme] = useState<ThemeType>("default");
+  
+  // Share Modal state
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareContent, setShareContent] = useState("");
   
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -218,6 +223,12 @@ export default function HomePage() {
     }
   };
 
+  // Handle share click
+  const handleShareClick = (content: string) => {
+    setShareContent(content);
+    setShareModalOpen(true);
+  };
+
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
@@ -289,6 +300,7 @@ export default function HomePage() {
                   message={msg}
                   onSave={msg.role === "assistant" ? handleSavePoem : undefined}
                   onExport={msg.role === "assistant" ? handleExportPoem : undefined}
+                  onShare={msg.role === "assistant" ? handleShareClick : undefined}
                 />
               ))}
 
@@ -334,6 +346,14 @@ export default function HomePage() {
 
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Share Modal */}
+          <ShareModal 
+            isOpen={shareModalOpen} 
+            onClose={() => setShareModalOpen(false)} 
+            content={shareContent}
+            penName={user?.penName}
+          />
 
           {/* Input Area */}
           <motion.div
