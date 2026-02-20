@@ -19,7 +19,6 @@ const QuoteIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const noiseSvg = `data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='0.5' filter='url(%23noiseFilter)'/%3E%3C/svg%3E`;
 
 export default function ShareModal({ isOpen, onClose, content, penName = "The Poet" }: ShareModalProps) {
   const [step, setStep] = useState<"select" | "preview">("select");
@@ -36,8 +35,6 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
       textPrimary: "text-[#FDECEA]",
       textSecondary: "text-[#FDECEA]/60",
       accent: "border-[#FDECEA]/15",
-      blend: "mix-blend-overlay",
-      vignette: "shadow-[inset_0_0_120px_rgba(0,0,0,0.8)]",
       emboss: "0 2px 4px rgba(0,0,0,0.5)",
       barBg: "bg-[#FDECEA]"
     },
@@ -47,19 +44,15 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
       textPrimary: "text-[#F5F5DC]",
       textSecondary: "text-[#F5F5DC]/50",
       accent: "border-[#F5F5DC]/10",
-      blend: "mix-blend-overlay",
-      vignette: "shadow-[inset_0_0_150px_rgba(0,0,0,0.9)]",
       emboss: "0 1px 2px rgba(0,0,0,0.8)",
       barBg: "bg-[#F5F5DC]"
     },
     {
       name: "Ethereal Dawn",
-      bg: "bg-gradient-to-tr from-[#FFB88C] via-[#DE6262] to-[#8A2387]",
+      bg: "bg-gradient-to-tr from-[#3f2b96] to-[#a8c0ff]",
       textPrimary: "text-[#FFFFFF]",
       textSecondary: "text-[#FFFFFF]/70",
       accent: "border-[#FFFFFF]/25",
-      blend: "mix-blend-soft-light",
-      vignette: "shadow-[inset_0_0_80px_rgba(0,0,0,0.2)]",
       emboss: "0 1px 3px rgba(0,0,0,0.3)",
       barBg: "bg-[#FFFFFF]"
     },
@@ -69,8 +62,6 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
       textPrimary: "text-[#F0F4F8]",
       textSecondary: "text-[#F0F4F8]/60",
       accent: "border-[#F0F4F8]/15",
-      blend: "mix-blend-overlay",
-      vignette: "shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]",
       emboss: "0 2px 4px rgba(0,0,0,0.4)",
       barBg: "bg-[#F0F4F8]"
     }
@@ -92,10 +83,10 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
 
     try {
       const canvas = await html2canvas(cardRef.current, {
-        scale: window.devicePixelRatio ? window.devicePixelRatio * 3 : 5, // God-level resolution
-        backgroundColor: null,
+        scale: 4, // Max resolution limit for standard memory devices
         useCORS: true,
         allowTaint: true,
+        backgroundColor: null,
         logging: false,
       });
 
@@ -177,17 +168,8 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                 {/* THE GOD-TIER CARD PREVIEW */}
                 <div
                   ref={cardRef}
-                  className={`w-[340px] min-h-[480px] ${currentTheme.bg} relative shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] rounded-sm flex flex-col overflow-hidden`}
+                  className={`w-[340px] min-h-[480px] ${currentTheme.bg} relative rounded-md flex flex-col overflow-hidden shadow-2xl`}
                 >
-                  {/* Grain Overlay */}
-                  <div
-                    className={`absolute inset-0 opacity-40 ${currentTheme.blend} pointer-events-none`}
-                    style={{ backgroundImage: `url("${noiseSvg}")` }}
-                  />
-
-                  {/* Vignette */}
-                  <div className={`absolute inset-0 ${currentTheme.vignette} pointer-events-none`} />
-
                   {/* Aesthetic Glow Effects */}
                   {selectedTheme === 0 && (
                     <div className="absolute top-0 right-0 w-80 h-80 bg-red-500/20 blur-[100px] rounded-full pointer-events-none" />
@@ -249,7 +231,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                     </div>
 
                     {/* Pure CSS Vintage Barcode */}
-                    <div className={`flex items-end gap-[2.5px] h-7 opacity-60 ${currentTheme.blend} pb-0.5`}>
+                    <div className={`flex items-end gap-[2.5px] h-7 opacity-80 pb-0.5`}>
                       {[2, 1, 3, 1, 2, 1, 4, 1, 2, 1.5, 3, 1].map((w: number, idx: number) => (
                         <div key={idx} className={`${currentTheme.barBg}`} style={{ width: `${w}px`, height: idx % 3 === 0 ? '100%' : '75%' }} />
                       ))}

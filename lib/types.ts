@@ -120,8 +120,6 @@ export interface ShareTheme {
   textPrimary: string;
   textSecondary: string;
   accent: string;
-  blend: string;
-  vignette: string;
   emboss: string;
   barBg: string;
 }
