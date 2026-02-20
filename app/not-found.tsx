@@ -73,7 +73,7 @@ export default function NotFound() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          "Not all who wander are lost, but this page certainly is..."
+          &quot;Not all who wander are lost, but this page certainly is...&quot;
         </motion.p>
       </motion.div>
     </div>

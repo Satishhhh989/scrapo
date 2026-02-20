@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, Filter, Trash2 } from "lucide-react";
+import { ArrowLeft, Search, Filter } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
@@ -49,7 +49,7 @@ export default function HistoryPage() {
         const querySnapshot = await getDocs(q);
         const poemsData: Poem[] = [];
 
-        querySnapshot.forEach((doc: any) => {
+        querySnapshot.forEach((doc: typeof querySnapshot.docs[0]) => {
           poemsData.push({ id: doc.id, ...doc.data() } as Poem);
         });
 

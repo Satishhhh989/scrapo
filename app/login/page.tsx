@@ -64,9 +64,13 @@ export default function LoginPage() {
         await signInWithEmailAndPassword(auth, email, password);
         router.push("/");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Auth error:", err);
-      setError(err.message || "Authentication failed");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Authentication failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -103,9 +107,13 @@ export default function LoginPage() {
       }
 
       router.push("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Google auth error:", err);
-      setError(err.message || "Google authentication failed");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Google authentication failed");
+      }
     } finally {
       setLoading(false);
     }

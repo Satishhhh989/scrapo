@@ -98,7 +98,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                 title: "Scrapo Archive",
               });
               return;
-            } catch (e) {
+            } catch {
               console.log("Share failed, falling back to download");
             }
           }
@@ -150,8 +150,8 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                     onClick={() => toggleLine(idx)}
                     whileTap={{ scale: 0.98 }}
                     className={`p-4 rounded-xl cursor-pointer border transition-all duration-300 ${selectedLines.includes(idx)
-                        ? "bg-white/10 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.03)]"
-                        : "bg-white/5 border-transparent hover:bg-white/[0.07]"
+                      ? "bg-white/10 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.03)]"
+                      : "bg-white/5 border-transparent hover:bg-white/[0.07]"
                       }`}
                   >
                     <p className={`font-playfair text-base leading-relaxed ${selectedLines.includes(idx) ? "text-white italic" : "text-white/60"}`}>
