@@ -1,7 +1,7 @@
 // lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 // Firebase Configuration (from environment variables)
 const firebaseConfig = {
@@ -19,7 +19,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize services
 export const auth: Auth = getAuth(app);
-export const db: Firestore = getFirestore(app);
+export const db = getFirestore(app);
 
 // Export the app instance for additional integrations
 export default app;

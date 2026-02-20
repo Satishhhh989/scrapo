@@ -112,3 +112,16 @@ export interface ExportOptions {
   quality: number;
   includeWatermark: boolean;
 }
+
+/** Represents the visual styling themes for the ShareCard **/
+export interface ShareTheme {
+  name: string;
+  bg: string;
+  textPrimary: string;
+  textSecondary: string;
+  accent: string;
+  blend: string;
+  vignette: string;
+  emboss: string;
+  barBg: string;
+}

@@ -23,7 +23,7 @@ import { exportAsPDF } from "@/lib/exportUtils";
 
 export default function HistoryPage() {
   const router = useRouter();
-  
+
   const [loading, setLoading] = useState(true);
   const [poems, setPoems] = useState<Poem[]>([]);
   const [filteredPoems, setFilteredPoems] = useState<Poem[]>([]);
@@ -49,7 +49,7 @@ export default function HistoryPage() {
         const querySnapshot = await getDocs(q);
         const poemsData: Poem[] = [];
 
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((doc: any) => {
           poemsData.push({ id: doc.id, ...doc.data() } as Poem);
         });
 
