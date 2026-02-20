@@ -31,38 +31,49 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
 
   const themes = [
     {
-      name: "Ivory Archive",
-      bg: "bg-[#EAE6DF]",
-      textPrimary: "text-[#1A1A1A]",
-      textSecondary: "text-[#1A1A1A]/50",
-      accent: "border-[#1A1A1A]/10",
-      blend: "mix-blend-multiply",
-      vignette: "shadow-[inset_0_0_80px_rgba(0,0,0,0.03)]",
-      emboss: "0 1px 1px rgba(255,255,255,0.8)",
-      barBg: "bg-[#1A1A1A]"
-    },
-    {
-      name: "Sepia Polaroid",
-      bg: "bg-[#D3C7B6]",
-      textPrimary: "text-[#3E342B]",
-      textSecondary: "text-[#3E342B]/60",
-      accent: "border-[#3E342B]/15",
-      blend: "mix-blend-multiply",
-      vignette: "shadow-[inset_0_0_100px_rgba(62,52,43,0.15)]",
-      emboss: "0 1px 1px rgba(255,255,255,0.4)",
-      barBg: "bg-[#3E342B]"
-    },
-    {
-      name: "Midnight Type",
-      bg: "bg-[#161618]",
-      textPrimary: "text-[#E6E4E0]",
-      textSecondary: "text-[#E6E4E0]/50",
-      accent: "border-[#E6E4E0]/10",
+      name: "Crimson Velvet",
+      bg: "bg-gradient-to-br from-[#4A0E17] via-[#2D060E] to-[#1A0307]",
+      textPrimary: "text-[#FDECEA]",
+      textSecondary: "text-[#FDECEA]/60",
+      accent: "border-[#FDECEA]/15",
       blend: "mix-blend-overlay",
-      vignette: "shadow-[inset_0_0_120px_rgba(0,0,0,0.6)]",
-      emboss: "0 -1px 1px rgba(0,0,0,0.8)",
-      barBg: "bg-[#E6E4E0]"
+      vignette: "shadow-[inset_0_0_120px_rgba(0,0,0,0.8)]",
+      emboss: "0 2px 4px rgba(0,0,0,0.5)",
+      barBg: "bg-[#FDECEA]"
     },
+    {
+      name: "Obsidian Aura",
+      bg: "bg-gradient-to-b from-[#1C1C1E] via-[#121212] to-[#0A0A0A]",
+      textPrimary: "text-[#F5F5DC]",
+      textSecondary: "text-[#F5F5DC]/50",
+      accent: "border-[#F5F5DC]/10",
+      blend: "mix-blend-overlay",
+      vignette: "shadow-[inset_0_0_150px_rgba(0,0,0,0.9)]",
+      emboss: "0 1px 2px rgba(0,0,0,0.8)",
+      barBg: "bg-[#F5F5DC]"
+    },
+    {
+      name: "Ethereal Dawn",
+      bg: "bg-gradient-to-tr from-[#FFB88C] via-[#DE6262] to-[#8A2387]",
+      textPrimary: "text-[#FFFFFF]",
+      textSecondary: "text-[#FFFFFF]/70",
+      accent: "border-[#FFFFFF]/25",
+      blend: "mix-blend-soft-light",
+      vignette: "shadow-[inset_0_0_80px_rgba(0,0,0,0.2)]",
+      emboss: "0 1px 3px rgba(0,0,0,0.3)",
+      barBg: "bg-[#FFFFFF]"
+    },
+    {
+      name: "Sapphire Abyss",
+      bg: "bg-gradient-to-bl from-[#0F2027] via-[#203A43] to-[#2C5364]",
+      textPrimary: "text-[#F0F4F8]",
+      textSecondary: "text-[#F0F4F8]/60",
+      accent: "border-[#F0F4F8]/15",
+      blend: "mix-blend-overlay",
+      vignette: "shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]",
+      emboss: "0 2px 4px rgba(0,0,0,0.4)",
+      barBg: "bg-[#F0F4F8]"
+    }
   ];
 
   const currentTheme: ShareTheme = themes[selectedTheme];
@@ -81,9 +92,10 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
 
     try {
       const canvas = await html2canvas(cardRef.current, {
-        scale: 3, // God-level resolution
+        scale: window.devicePixelRatio ? window.devicePixelRatio * 3 : 5, // God-level resolution
         backgroundColor: null,
         useCORS: true,
+        allowTaint: true,
         logging: false,
       });
 
@@ -176,17 +188,21 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                   {/* Vignette */}
                   <div className={`absolute inset-0 ${currentTheme.vignette} pointer-events-none`} />
 
-                  {/* Subtle Light Leak (only for light themes) */}
-                  {selectedTheme !== 2 && (
+                  {/* Aesthetic Glow Effects */}
+                  {selectedTheme === 0 && (
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-red-500/20 blur-[100px] rounded-full pointer-events-none" />
+                  )}
+                  {selectedTheme === 1 && (
+                    <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 blur-[100px] rounded-full pointer-events-none" />
+                  )}
+                  {selectedTheme === 2 && (
                     <>
-                      <div className="absolute -top-20 -left-20 w-64 h-64 bg-white/40 blur-[70px] rounded-full pointer-events-none" />
-                      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#3E342B]/10 blur-[80px] rounded-full pointer-events-none" />
+                      <div className="absolute top-10 left-10 w-48 h-48 bg-white/30 blur-[60px] rounded-full pointer-events-none" />
+                      <div className="absolute bottom-10 right-10 w-64 h-64 bg-yellow-300/20 blur-[80px] rounded-full pointer-events-none" />
                     </>
                   )}
-
-                  {/* Optional vintage distressing layer */}
-                  {selectedTheme === 1 && (
-                    <div className="absolute -top-10 -right-12 w-48 h-48 rounded-full border-[1.5px] border-[#3E342B]/10 mix-blend-multiply pointer-events-none" style={{ borderRadius: '43% 57% 70% 30% / 30% 30% 70% 70%' }}></div>
+                  {selectedTheme === 3 && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
                   )}
 
                   {/* Top Metadata */}
@@ -208,7 +224,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                         <p
                           key={i}
                           className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide ${currentTheme.textPrimary}`}
-                          style={{ textShadow: currentTheme.emboss, fontWeight: 500 }}
+                          style={{ textShadow: currentTheme.emboss, fontWeight: 600 }}
                         >
                           {lines[i]}
                         </p>
