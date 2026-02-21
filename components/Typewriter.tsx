@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { parsePoetryMarkdown } from "@/lib/utils";
 
 interface TypewriterTextProps {
   text: string;
@@ -44,7 +45,7 @@ export default function TypewriterText({
       <span
         className="font-courier leading-relaxed"
         dangerouslySetInnerHTML={{
-          __html: displayedText.replace(/\n/g, "<br>"),
+          __html: parsePoetryMarkdown(displayedText),
         }}
       />
 

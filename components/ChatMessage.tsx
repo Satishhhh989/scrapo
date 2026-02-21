@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Message } from "@/lib/types";
 import { Copy, Download, Heart, Share2, Maximize2, Minimize2, RefreshCcw } from "lucide-react";
 import TypewriterText from "./Typewriter";
+import { parsePoetryMarkdown } from "@/lib/utils";
 
 interface ChatMessageProps {
   message: Message;
@@ -47,7 +48,7 @@ export default function ChatMessage({
           {isBot && isStreaming ? (
             <TypewriterText text={message.content} />
           ) : (
-            message.content
+            <span dangerouslySetInnerHTML={{ __html: parsePoetryMarkdown(message.content) }} />
           )}
         </div>
 

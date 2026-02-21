@@ -60,9 +60,10 @@ export function sanitizeFilename(text: string): string {
  * Parse markdown-style formatting for poems
  */
 export function parsePoetryMarkdown(text: string): string {
+  if (!text) return "";
   return text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/_(.*?)_/g, "<em>$1</em>")
+    .replace(/\*\*([\s\S]*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([\s\S]*?)\*/g, "<em class=\"opacity-90 italic\">$1</em>")
+    .replace(/_([\s\S]*?)_/g, "<em class=\"opacity-90 italic\">$1</em>")
     .replace(/\n/g, "<br>");
 }
