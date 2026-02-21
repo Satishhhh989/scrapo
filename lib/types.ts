@@ -98,6 +98,7 @@ export interface GeneratePoemRequest {
   mood: MoodType;
   penName?: string;
   conversationHistory?: Message[];
+  command?: "expand" | "shorten" | "rewrite_pov";
 }
 
 export interface GeneratePoemResponse {

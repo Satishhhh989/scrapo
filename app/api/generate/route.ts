@@ -9,7 +9,7 @@ import { GeneratePoemRequest, GeneratePoemResponse, MOODS } from "@/lib/types";
 export async function POST(req: NextRequest) {
   try {
     const body: GeneratePoemRequest = await req.json();
-    const { prompt, mood, penName, conversationHistory = [] } = body;
+    const { prompt, mood, penName, conversationHistory = [], command } = body;
 
     // Validate input
     if (!prompt || !prompt.trim()) {
@@ -30,11 +30,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Build system prompt (same as original)
-    const systemPrompt = `You are a poetic AI assistant with the melancholic, nostalgic style of Lana Del Rey. 
+    let systemPrompt = `You are a poetic AI assistant with the melancholic, nostalgic style of Lana Del Rey. 
 Respond in a dreamy, cinematic way with references to Americana, vintage culture, and romantic melancholy. 
 Use markdown for formatting when needed. Include occasional song lyrics or poetic verses in your responses. 
 Keep responses under 300 words. ${penName ? `Address the user as "${penName}".` : ""}
 ${MOODS[mood] || MOODS.melancholic}`;
+
+    // Inject AI Action Commands if present
+    if (command === "expand") {
+      systemPrompt += `\n\nCOMMAND INSTRUCTION: The user wants to EXPAND the previous verse. Write a beautiful new stanza that continues the story seamlessly.`;
+    } else if (command === "shorten") {
+      systemPrompt += `\n\nCOMMAND INSTRUCTION: The user wants to SHORTEN the previous verse. Condense it into a sharp, deeply emotional 2-line poetic haiku.`;
+    } else if (command === "rewrite_pov") {
+      systemPrompt += `\n\nCOMMAND INSTRUCTION: The user wants to REWRITE the previous poem from a different person's perspective (e.g. the lover, the enemy, the observer). Make it distinct but connected.`;
+    }
 
     // Prepare messages for API
     const messages = [

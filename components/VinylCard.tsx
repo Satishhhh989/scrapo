@@ -26,7 +26,7 @@ export default function VinylCard({
 }: VinylCardProps) {
   return (
     <motion.div
-      className="group relative cursor-pointer"
+      className="group relative cursor-pointer break-inside-avoid h-full w-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
@@ -34,7 +34,7 @@ export default function VinylCard({
       onClick={() => onSelect(poem)}
     >
       {/* Glass Slate */}
-      <div className="relative aspect-square bg-[#111216] rounded-xl border border-white/10 shadow-lg overflow-hidden transition-all duration-300 group-hover:border-white/20 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+      <div className="relative min-h-[260px] h-full bg-[#111216] rounded-xl border border-white/10 shadow-lg overflow-hidden transition-all duration-300 group-hover:border-white/20 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.05)]">
         {/* Subtle inner glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] to-transparent pointer-events-none" />
 
@@ -45,8 +45,8 @@ export default function VinylCard({
             <h3 className="font-playfair text-xl md:text-2xl font-semibold text-white/90 line-clamp-2 mb-3 tracking-wide">
               {poem.title}
             </h3>
-            <p className="font-playfair text-sm text-white/50 line-clamp-3 leading-relaxed italic">
-              {poem.content.substring(0, 100)}...
+            <p className="font-playfair text-sm text-white/50 line-clamp-6 leading-relaxed italic">
+              {poem.content.substring(0, 300)}...
             </p>
           </div>
 
@@ -77,8 +77,8 @@ export default function VinylCard({
           >
             <Heart
               className={`w-5 h-5 stroke-[1.5px] ${poem.isFavorite
-                  ? "fill-amber-500/80 text-amber-500/80 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                  : "text-white/70"
+                ? "fill-amber-500/80 text-amber-500/80 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                : "text-white/70"
                 }`}
             />
           </motion.button>

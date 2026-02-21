@@ -134,6 +134,71 @@ export default function HomePage() {
     }
   };
 
+  const handleGenerateAction = async (command: "expand" | "shorten" | "rewrite_pov", content: string) => {
+    if (isGenerating) return;
+
+    let userPrompt = "";
+    if (command === "expand") userPrompt = "Enhance and expand this verse...";
+    else if (command === "shorten") userPrompt = "Shorten this into a sharp haiku...";
+    else if (command === "rewrite_pov") userPrompt = "Rewrite this from another perspective...";
+
+    const userMessage: Message = {
+      id: generateId(),
+      role: "user",
+      content: userPrompt,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev: Message[]) => [...prev, userMessage]);
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: content,
+          mood: currentMood,
+          penName: user?.penName,
+          conversationHistory: messages,
+          command: command,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to generate response");
+      }
+
+      const botMessage: Message = {
+        id: generateId(),
+        role: "assistant",
+        content: data.content,
+        timestamp: new Date().toISOString(),
+      };
+
+      setStreamingMessage(botMessage);
+
+      setTimeout(() => {
+        setMessages((prev: Message[]) => [...prev, botMessage]);
+        setStreamingMessage(null);
+      }, data.content.length * 50 + 500);
+
+    } catch (error) {
+      console.error("Generation error:", error);
+      const errorMsg: Message = {
+        id: generateId(),
+        role: "assistant",
+        content: "The ink has stalled. Let us pause and try once more...",
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev: Message[]) => [...prev, errorMsg]);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -222,137 +287,188 @@ export default function HomePage() {
 
   return (
     <div className="h-[100dvh] w-full flex flex-col items-center bg-[#0D0E12] overflow-hidden relative">
-      <div className="w-full max-w-2xl h-full flex flex-col relative z-10">
+      <div className="w-full max-w-[1200px] h-full flex relative z-10 px-4 md:px-8">
+        {/* Left Spacer for Perfect Centering on Desktop */}
+        <div className="hidden lg:block w-72 shrink-0" />
 
-        {/* Minimal Header */}
-        <motion.header
-          className="flex-shrink-0 px-6 pt-12 pb-4 flex justify-between items-center z-20"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
-        >
-          <div className="flex flex-col">
-            <h1 className="font-playfair text-xl text-[#F5F5F5] font-medium tracking-wide">
-              Scrapo
-            </h1>
-            <p className="font-courier text-[10px] text-[#F5F5F5]/40 tracking-[0.2em] uppercase mt-1">
-              {user?.penName || "Unknown"}
-            </p>
-          </div>
+        {/* Main Chat Column */}
+        <div className="flex-1 w-full max-w-2xl h-full flex flex-col relative z-10 mx-auto">
+          {/* Minimal Header */}
+          <motion.header
+            className="flex-shrink-0 px-6 pt-12 pb-4 flex justify-between items-center z-20"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
+          >
+            <div className="flex flex-col">
+              <h1 className="font-playfair text-xl text-[#F5F5F5] font-medium tracking-wide">
+                Scrapo
+              </h1>
+              <p className="font-courier text-[10px] text-[#F5F5F5]/40 tracking-[0.2em] uppercase mt-1">
+                {user?.penName || "Unknown"}
+              </p>
+            </div>
 
-          <div className="flex gap-3">
-            <motion.button
-              onClick={toggleMood}
-              className="group p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
-              whileTap={{ scale: 0.92 }}
-              title={`Mood: ${currentMood}`}
-            >
-              <Sparkles className="w-5 h-5 stroke-[1.5px] group-hover:fill-white/10" />
-            </motion.button>
-
-            <motion.button
-              onClick={() => router.push("/history")}
-              className="p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
-              whileTap={{ scale: 0.92 }}
-              title="Archive"
-            >
-              <BookOpen className="w-5 h-5 stroke-[1.5px]" />
-            </motion.button>
-          </div>
-        </motion.header>
-
-        {/* scrollable messages area */}
-        <div id="chat-container" className="flex-1 overflow-y-auto px-6 pt-4 pb-40 scrollbar-hide space-y-10">
-          <AnimatePresence mode="popLayout">
-            {messages.map((msg) => (
-              <ChatMessage
-                key={msg.id}
-                message={msg}
-                onSave={msg.role === "assistant" ? handleSavePoem : undefined}
-                onExport={msg.role === "assistant" ? handleExportPoem : undefined}
-                onShare={msg.role === "assistant" ? handleShareClick : undefined}
-              />
-            ))}
-
-            {streamingMessage && (
-              <ChatMessage
-                key="streaming"
-                message={streamingMessage}
-                isStreaming
-              />
-            )}
-
-            {isGenerating && !streamingMessage && (
-              <motion.div
-                className="flex justify-start opacity-60 ml-4"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 0.6, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            <div className="flex gap-3 lg:hidden">
+              <motion.button
+                onClick={toggleMood}
+                className="group p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
+                whileTap={{ scale: 0.92 }}
+                title={`Mood: ${currentMood}`}
               >
-                <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                  <div className="flex gap-1.5">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        className="w-1.5 h-1.5 bg-[#F5F5F5]/70 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                        animate={{ y: [0, -3, 0] }}
-                        transition={{
-                          duration: 0.8,
-                          repeat: Infinity,
-                          delay: i * 0.15,
-                          ease: "easeInOut"
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div ref={messagesEndRef} className="h-4" />
-        </div>
-
-        {/* Floating Dock Input area mapping the thumb zone perfectly */}
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 w-full z-40 pb-safe pointer-events-none"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
-        >
-          {/* Subtle gradient to wash out the text behind the dock */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0E12] via-[#0D0E12]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
-
-          <div className="px-5 pb-6 pt-2 pointer-events-auto">
-            <div className="flex items-end gap-3 bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Whisper a prompt..."
-                disabled={isGenerating}
-                className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#F5F5F5] placeholder:text-[#F5F5F5]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
-                rows={1}
-              />
+                <Sparkles className="w-5 h-5 stroke-[1.5px] group-hover:fill-white/10" />
+              </motion.button>
 
               <motion.button
-                onClick={handleSend}
-                disabled={!input.trim() || isGenerating}
-                className="mb-1 mr-1 relative p-3.5 bg-white text-black rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 transition-shadow hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
+                onClick={() => router.push("/history")}
+                className="p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
                 whileTap={{ scale: 0.92 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                title="Archive"
               >
-                {isGenerating ? (
-                  <Loader2 className="w-5 h-5 animate-spin stroke-[2px]" />
-                ) : (
-                  <Send className="w-5 h-5 stroke-[2px] translate-x-[1px] translate-y-[1px]" />
-                )}
+                <BookOpen className="w-5 h-5 stroke-[1.5px]" />
               </motion.button>
             </div>
+          </motion.header>
+
+          {/* scrollable messages area */}
+          <div id="chat-container" className="flex-1 overflow-y-auto px-6 pt-4 pb-40 scrollbar-hide space-y-10">
+            <AnimatePresence mode="popLayout">
+              {messages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  message={msg}
+                  onSave={msg.role === "assistant" ? handleSavePoem : undefined}
+                  onExport={msg.role === "assistant" ? handleExportPoem : undefined}
+                  onShare={msg.role === "assistant" ? handleShareClick : undefined}
+                  onGenerateAction={msg.role === "assistant" ? handleGenerateAction : undefined}
+                />
+              ))}
+
+              {streamingMessage && (
+                <ChatMessage
+                  key="streaming"
+                  message={streamingMessage}
+                  isStreaming
+                />
+              )}
+
+              {isGenerating && !streamingMessage && (
+                <motion.div
+                  className="flex justify-start opacity-60 ml-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 0.6, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+                    <div className="flex gap-1.5">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-1.5 h-1.5 bg-[#F5F5F5]/70 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+                          animate={{ y: [0, -3, 0] }}
+                          transition={{
+                            duration: 0.8,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div ref={messagesEndRef} className="h-4" />
           </div>
-        </motion.div>
+
+          {/* Floating Dock Input area mapping the thumb zone perfectly */}
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 w-full z-40 pb-safe pointer-events-none"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
+          >
+            {/* Subtle gradient to wash out the text behind the dock */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0E12] via-[#0D0E12]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
+
+            <div className="px-5 pb-6 pt-2 pointer-events-auto">
+              <div className="flex items-end gap-3 bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Whisper a prompt..."
+                  disabled={isGenerating}
+                  className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#F5F5F5] placeholder:text-[#F5F5F5]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
+                  rows={1}
+                />
+
+                <motion.button
+                  onClick={handleSend}
+                  disabled={!input.trim() || isGenerating}
+                  className="mb-1 mr-1 relative p-3.5 bg-white text-black rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 transition-shadow hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  {isGenerating ? (
+                    <Loader2 className="w-5 h-5 animate-spin stroke-[2px]" />
+                  ) : (
+                    <Send className="w-5 h-5 stroke-[2px] translate-x-[1px] translate-y-[1px]" />
+                  )}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="hidden lg:flex flex-col w-72 border-l border-white/5 pl-8 py-12 shrink-0 h-full overflow-y-auto !scrollbar-hide z-10">
+          <h3 className="font-playfair text-white/90 text-xl tracking-wide mb-8">Sanctuary</h3>
+
+          <div className="space-y-6">
+            <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl shadow-lg">
+              <p className="font-courier text-[10px] text-white/40 uppercase tracking-widest mb-3">Atmosphere</p>
+              <div className="flex items-center justify-between">
+                <span className="capitalize font-playfair text-white/90 text-lg">{currentMood}</span>
+                <motion.button
+                  onClick={toggleMood}
+                  className="p-2 bg-white/5 border border-white/10 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors shadow-sm"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                </motion.button>
+              </div>
+            </div>
+
+            <div
+              className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.05] transition-colors group shadow-lg"
+              onClick={() => router.push('/history')}
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-white/5 border border-white/10 rounded-full group-hover:bg-white/10 transition-colors">
+                  <BookOpen className="w-4 h-4 text-white/60 group-hover:text-white" />
+                </div>
+                <div>
+                  <p className="font-playfair text-white/90 text-lg">The Archive</p>
+                  <p className="font-courier text-[10px] text-white/40 uppercase tracking-widest mt-1">View Collection</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-8 opacity-40 pointer-events-none border-t border-white/5 mt-auto">
+              <p className="font-courier text-[10px] text-white/50 tracking-[0.2em] leading-loose uppercase">
+                Midnight Velvet<br />
+                System Active<br />
+                {new Date().getFullYear()}
+              </p>
+            </div>
+          </div>
+        </div>
 
         <ShareModal
           isOpen={shareModalOpen}
