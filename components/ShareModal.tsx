@@ -24,6 +24,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
   const [step, setStep] = useState<"select" | "preview">("select");
   const [selectedLines, setSelectedLines] = useState<{ originalIndex: number; text: string }[]>([]);
   const [selectedTheme, setSelectedTheme] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState<"poster" | "square">("poster");
   const cardRef = useRef<HTMLDivElement>(null);
 
   const lines = content.split("\n").filter((line) => line.trim() !== "");
@@ -100,6 +101,33 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
       accent: "border-[#FF4D4D]/20",
       emboss: "0 1px 4px rgba(255,0,0,0.5)",
       barBg: "bg-[#FF4D4D]"
+    },
+    {
+      name: "The Void",
+      bg: "bg-black",
+      textPrimary: "text-[#D4D4D4]",
+      textSecondary: "text-[#D4D4D4]/40",
+      accent: "border-[#D4D4D4]/10",
+      emboss: "none",
+      barBg: "bg-[#D4D4D4]"
+    },
+    {
+      name: "Starlight",
+      bg: "bg-gradient-to-tr from-[#0B0C10] to-[#1F2833]",
+      textPrimary: "text-[#66FCF1]",
+      textSecondary: "text-[#66FCF1]/50",
+      accent: "border-[#45A29E]/30",
+      emboss: "0 0 10px rgba(102,252,241,0.4)",
+      barBg: "bg-[#45A29E]"
+    },
+    {
+      name: "Abyssal Pearl",
+      bg: "bg-gradient-to-b from-[#0F172A] to-[#020617]",
+      textPrimary: "text-[#E2E8F0]",
+      textSecondary: "text-[#E2E8F0]/50",
+      accent: "border-[#94A3B8]/20",
+      emboss: "0 1px 2px rgba(0,0,0,0.8)",
+      barBg: "bg-[#94A3B8]"
     }
   ];
 
@@ -176,7 +204,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -222,10 +250,26 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
               </div>
             ) : (
               <div className="flex flex-col items-center gap-8">
+                {/* Aspect Ratio Toggle */}
+                <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 w-48 mx-auto mt-2">
+                  <button
+                    onClick={() => setAspectRatio("poster")}
+                    className={`flex-1 text-xs py-1.5 font-cinzel rounded-md transition-all ${aspectRatio === "poster" ? "bg-white text-black font-bold shadow-md" : "text-white/50 hover:text-white"}`}
+                  >
+                    POSTER
+                  </button>
+                  <button
+                    onClick={() => setAspectRatio("square")}
+                    className={`flex-1 text-xs py-1.5 font-cinzel rounded-md transition-all ${aspectRatio === "square" ? "bg-white text-black font-bold shadow-md" : "text-white/50 hover:text-white"}`}
+                  >
+                    SQUARE
+                  </button>
+                </div>
+
                 {/* THE GOD-TIER CARD PREVIEW */}
                 <div
                   ref={cardRef}
-                  className={`w-[340px] min-h-[480px] ${currentTheme.bg} relative rounded-md flex flex-col overflow-hidden shadow-2xl`}
+                  className={`w-[340px] ${aspectRatio === "poster" ? "min-h-[480px]" : "min-h-[340px]"} ${currentTheme.bg} relative rounded-md flex flex-col overflow-hidden shadow-2xl transition-all duration-500 ease-in-out`}
                 >
                   {/* Aesthetic Glow Effects */}
                   {selectedTheme === 0 && (
@@ -285,27 +329,41 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                     <QuoteIcon className={`w-8 h-8 opacity-[0.07] absolute bottom-6 right-8 translate-y-1/2 rotate-180 ${currentTheme.textPrimary}`} />
                   </div>
 
-                  {/* Vintage "Spotify" Footer */}
-                  <div className={`w-full px-8 pb-8 pt-6 border-t ${currentTheme.accent} mt-auto z-10 flex justify-between items-end`}>
-                    <div className="flex flex-col gap-1.5">
+                  {/* Vintage "Spotify" Footer OR Minimal Square Footer */}
+                  {aspectRatio === "poster" ? (
+                    <div className={`w-full px-8 pb-8 pt-6 border-t ${currentTheme.accent} mt-auto z-10 flex justify-between items-end`}>
+                      <div className="flex flex-col gap-1.5">
+                        <span
+                          className={`font-cinzel text-sm font-semibold tracking-wider ${currentTheme.textPrimary}`}
+                          style={{ textShadow: currentTheme.emboss }}
+                        >
+                          {penName}
+                        </span>
+                        <span className={`font-courier text-[8px] uppercase tracking-[0.25em] ${currentTheme.textSecondary} flex items-center gap-2`}>
+                          Curated Verse <span className="w-1 h-1 rounded-full bg-current opacity-50 block"></span> {new Date().getFullYear()}
+                        </span>
+                      </div>
+
+                      {/* Pure CSS Vintage Barcode */}
+                      <div className={`flex items-end gap-[2.5px] h-7 opacity-80 pb-0.5`}>
+                        {[2, 1, 3, 1, 2, 1, 4, 1, 2, 1.5, 3, 1].map((w: number, idx: number) => (
+                          <div key={idx} className={`${currentTheme.barBg}`} style={{ width: `${w}px`, height: idx % 3 === 0 ? '100%' : '75%' }} />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className={`w-full px-8 pb-6 mt-auto z-10 flex flex-col items-center justify-center opacity-80 gap-2`}>
                       <span
-                        className={`font-cinzel text-sm font-semibold tracking-wider ${currentTheme.textPrimary}`}
-                        style={{ textShadow: currentTheme.emboss }}
+                        className={`font-cinzel text-sm font-semibold tracking-widest uppercase ${currentTheme.textPrimary}`}
+                        style={{ textShadow: currentTheme.emboss, letterSpacing: '0.3em' }}
                       >
                         {penName}
                       </span>
-                      <span className={`font-courier text-[8px] uppercase tracking-[0.25em] ${currentTheme.textSecondary} flex items-center gap-2`}>
-                        Curated Verse <span className="w-1 h-1 rounded-full bg-current opacity-50 block"></span> {new Date().getFullYear()}
+                      <span className={`font-courier text-[7px] uppercase tracking-[0.4em] ${currentTheme.textSecondary}`}>
+                        SCRAPO ARCHIVE
                       </span>
                     </div>
-
-                    {/* Pure CSS Vintage Barcode */}
-                    <div className={`flex items-end gap-[2.5px] h-7 opacity-80 pb-0.5`}>
-                      {[2, 1, 3, 1, 2, 1, 4, 1, 2, 1.5, 3, 1].map((w: number, idx: number) => (
-                        <div key={idx} className={`${currentTheme.barBg}`} style={{ width: `${w}px`, height: idx % 3 === 0 ? '100%' : '75%' }} />
-                      ))}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Theme Selector */}
