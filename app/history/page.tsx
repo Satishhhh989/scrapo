@@ -132,7 +132,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 bg-[#0D0E12]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -144,19 +144,19 @@ export default function HistoryPage() {
             <div className="flex items-center gap-4">
               <motion.button
                 onClick={() => router.push("/")}
-                className="p-2 bg-vintage-paper border-2 border-faded-gold rounded-full hover:bg-rose-quartz transition-colors"
+                className="p-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full hover:bg-white/10 transition-colors shadow-lg"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <ArrowLeft className="w-5 h-5 text-melancholy-blue stroke-[1.5px]" />
+                <ArrowLeft className="w-5 h-5 text-[#F5F5F5] stroke-[1.5px]" />
               </motion.button>
 
               <div>
-                <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-sepia-dark">
-                  The Vinyl Collection
+                <h1 className="font-cinzel text-3xl md:text-5xl font-bold text-[#F5F5F5] tracking-wide">
+                  The Archive
                 </h1>
-                <p className="font-sans text-sm text-vintage-red italic mt-1">
-                  {poems.length} poems collected
+                <p className="font-courier text-xs text-[#F5F5F5]/40 uppercase tracking-[0.2em] mt-2">
+                  {poems.length} curated verses
                 </p>
               </div>
             </div>
@@ -166,25 +166,25 @@ export default function HistoryPage() {
           <div className="flex flex-col md:flex-row gap-3">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-melancholy-blue/50 stroke-[1.5px]" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 stroke-[1.5px]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search poems..."
-                className="w-full pl-10 pr-4 py-3 bg-vintage-paper border-2 border-dusty-rose rounded-sm font-sans text-ink-black placeholder:text-melancholy-blue/50 focus:outline-none focus:border-cherry-red transition-colors"
+                placeholder="Search the archive..."
+                className="w-full pl-12 pr-4 py-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl font-sans text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-colors shadow-inner"
               />
             </div>
 
             {/* Mood Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-melancholy-blue/50 stroke-[1.5px]" />
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 stroke-[1.5px]" />
               <select
                 value={filterMood}
                 onChange={(e) => setFilterMood(e.target.value as MoodType | "all")}
-                className="w-full md:w-48 pl-10 pr-4 py-3 bg-vintage-paper border-2 border-dusty-rose rounded-sm font-sans text-ink-black focus:outline-none focus:border-cherry-red transition-colors appearance-none cursor-pointer"
+                className="w-full md:w-48 pl-12 pr-4 py-3 bg-[#111216] border border-white/10 rounded-xl font-sans text-white focus:outline-none focus:border-white/30 transition-colors appearance-none cursor-pointer shadow-inner"
               >
-                <option value="all">All Moods</option>
+                <option value="all">Every Mood</option>
                 <option value="melancholic">Melancholic</option>
                 <option value="romantic">Romantic</option>
                 <option value="rebellious">Rebellious</option>
@@ -197,12 +197,12 @@ export default function HistoryPage() {
         {/* Poems Grid */}
         {filteredPoems.length === 0 ? (
           <motion.div
-            className="text-center py-20"
+            className="text-center py-32"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <p className="font-playfair text-2xl text-melancholy-blue/70 italic">
-              No poems found. Start creating your collection...
+            <p className="font-playfair text-xl md:text-2xl text-white/30 italic font-light tracking-wide">
+              The archive is empty. Begin your story...
             </p>
           </motion.div>
         ) : (
@@ -232,33 +232,32 @@ export default function HistoryPage() {
       <AnimatePresence>
         {selectedPoem && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sepia-dark/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedPoem(null)}
           >
             <motion.div
-              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-vintage-paper border-2 border-faded-gold shadow-polaroid rounded-sm p-6 md:p-8"
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
+              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0A0A0A] border border-white/10 shadow-2xl rounded-2xl p-6 md:p-10 relative scrollbar-thin scrollbar-thumb-white/10"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Film grain */}
-              <div className="absolute inset-0 bg-film-grain opacity-10 pointer-events-none rounded-sm" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none rounded-2xl" />
 
-              <div className="relative">
+              <div className="relative z-10">
                 {/* Header */}
-                <div className="mb-6">
-                  <h2 className="font-playfair text-2xl md:text-3xl font-bold text-ink-black mb-2">
+                <div className="mb-8">
+                  <h2 className="font-playfair text-3xl md:text-4xl font-semibold text-white mb-4 tracking-wide">
                     {selectedPoem.title}
                   </h2>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="px-2 py-1 bg-cherry-red/10 border border-cherry-red/30 rounded-sm font-sans text-xs text-cherry-red uppercase tracking-wide">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-md font-courier text-[10px] text-white/70 uppercase tracking-widest shadow-inner">
                       {selectedPoem.mood}
                     </span>
-                    <span className="font-sans text-sm text-melancholy-blue italic">
+                    <span className="font-courier text-[10px] text-white/40 uppercase tracking-widest">
                       {new Date(selectedPoem.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -269,31 +268,41 @@ export default function HistoryPage() {
                 </div>
 
                 {/* Divider */}
-                <div className="w-20 h-0.5 bg-gradient-to-r from-faded-gold to-transparent mb-6" />
+                <div className="w-full h-px bg-gradient-to-r from-white/20 via-white/5 to-transparent mb-8" />
+
+                {/* Chat History Context */}
+                {selectedPoem.prompt && (
+                  <div className="mb-8 p-5 bg-white/5 rounded-xl border border-white/5 backdrop-blur-sm">
+                    <p className="font-courier text-[10px] uppercase tracking-widest text-[#F5F5F5]/40 mb-3">You whispered:</p>
+                    <p className="font-sans text-sm md:text-base text-[#F5F5F5]/80 italic border-l-2 border-white/20 pl-4 py-1">
+                      &quot;{selectedPoem.prompt}&quot;
+                    </p>
+                  </div>
+                )}
 
                 {/* Content */}
-                <div className="font-courier text-base md:text-lg text-ink-black leading-relaxed whitespace-pre-wrap mb-6">
+                <div className="font-playfair text-lg md:text-xl text-[#F5F5F5]/90 leading-relaxed whitespace-pre-wrap mb-10 pl-2">
                   {selectedPoem.content}
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 justify-end">
+                <div className="flex gap-3 justify-end pt-6 border-t border-white/5">
                   <motion.button
                     onClick={() => handleExport(selectedPoem)}
-                    className="px-4 py-2 bg-gradient-to-r from-faded-gold to-cherry-red text-vintage-paper font-sans rounded-sm hover:from-cherry-red hover:to-faded-gold transition-all"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ y: 0 }}
+                    className="px-6 py-2.5 bg-white/10 text-white font-cinzel text-xs font-bold tracking-[0.2em] uppercase rounded-lg hover:bg-white/20 transition-all border border-white/10"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     Eternalize
                   </motion.button>
 
                   <motion.button
                     onClick={() => setSelectedPoem(null)}
-                    className="px-4 py-2 bg-vintage-paper border-2 border-dusty-rose text-ink-black font-sans rounded-sm hover:bg-rose-quartz transition-colors"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ y: 0 }}
+                    className="px-6 py-2.5 bg-transparent border border-white/10 text-white/70 font-cinzel text-xs tracking-[0.2em] uppercase rounded-lg hover:bg-white/5 hover:text-white transition-all"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    Close
+                    Return
                   </motion.button>
                 </div>
               </div>
