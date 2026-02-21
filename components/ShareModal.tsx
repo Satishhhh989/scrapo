@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Share2, Image as ImageIcon } from "lucide-react";
+import { X, Share2, Image as ImageIcon, Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import { ShareTheme } from "@/lib/types";
 
@@ -22,7 +22,7 @@ const QuoteIcon = ({ className }: { className?: string }) => (
 
 export default function ShareModal({ isOpen, onClose, content, penName = "The Poet" }: ShareModalProps) {
   const [step, setStep] = useState<"select" | "preview">("select");
-  const [selectedLines, setSelectedLines] = useState<number[]>([]);
+  const [selectedLines, setSelectedLines] = useState<{ originalIndex: number; text: string }[]>([]);
   const [selectedTheme, setSelectedTheme] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -64,23 +64,66 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
       accent: "border-[#F0F4F8]/15",
       emboss: "0 2px 4px rgba(0,0,0,0.4)",
       barBg: "bg-[#F0F4F8]"
+    },
+    {
+      name: "Neon Cyberpunk",
+      bg: "bg-[#090A0F]",
+      textPrimary: "text-[#00FFCC]",
+      textSecondary: "text-[#00FFCC]/60",
+      accent: "border-[#FF00FF]/30",
+      emboss: "0 0 8px rgba(0,255,204,0.6)",
+      barBg: "bg-[#FF00FF]"
+    },
+    {
+      name: "Film Noir",
+      bg: "bg-[#050505]",
+      textPrimary: "text-[#E5E5E5]",
+      textSecondary: "text-[#E5E5E5]/50",
+      accent: "border-[#E5E5E5]/15",
+      emboss: "none",
+      barBg: "bg-[#E5E5E5]"
+    },
+    {
+      name: "Ethereal Pearl",
+      bg: "bg-gradient-to-tr from-[#E0EAFC] to-[#CFDEF3]",
+      textPrimary: "text-[#1A1A1A]",
+      textSecondary: "text-[#1A1A1A]/50",
+      accent: "border-[#1A1A1A]/10",
+      emboss: "0 1px 1px rgba(255,255,255,0.8)",
+      barBg: "bg-[#1A1A1A]"
+    },
+    {
+      name: "Blood Moon",
+      bg: "bg-gradient-to-b from-[#110101] to-[#360808]",
+      textPrimary: "text-[#FF4D4D]",
+      textSecondary: "text-[#FF4D4D]/60",
+      accent: "border-[#FF4D4D]/20",
+      emboss: "0 1px 4px rgba(255,0,0,0.5)",
+      barBg: "bg-[#FF4D4D]"
     }
   ];
 
   const currentTheme: ShareTheme = themes[selectedTheme];
 
-  const toggleLine = (index: number) => {
-    if (selectedLines.includes(index)) {
-      setSelectedLines(prev => prev.filter((i: number) => i !== index));
+  const toggleLine = (index: number, text: string) => {
+    if (selectedLines.find((l) => l.originalIndex === index)) {
+      setSelectedLines(prev => prev.filter((l) => l.originalIndex !== index));
     } else {
       if (selectedLines.length >= 4) return;
-      setSelectedLines(prev => [...prev, index].sort((a: number, b: number) => a - b));
+      setSelectedLines(prev => [...prev, { originalIndex: index, text }].sort((a, b) => a.originalIndex - b.originalIndex));
     }
   };
 
-  const handleShare = async () => {
-    if (!cardRef.current) return;
+  const handleLineEdit = (index: number, newText: string) => {
+    setSelectedLines(prev =>
+      prev.map(line =>
+        line.originalIndex === index ? { ...line, text: newText } : line
+      )
+    );
+  };
 
+  const generateCanvasBlob = async (): Promise<Blob | null> => {
+    if (!cardRef.current) return null;
     try {
       const canvas = await html2canvas(cardRef.current, {
         scale: 4, // Max resolution limit for standard memory devices
@@ -89,33 +132,44 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
         backgroundColor: null,
         logging: false,
       });
-
-      canvas.toBlob(async (blob: Blob | null) => {
-        if (!blob) return;
-        const file = new File([blob], "scrapo-archive.png", { type: "image/png" });
-        if (navigator.share && typeof navigator.canShare === "function") {
-          if (navigator.canShare({ files: [file] })) {
-            try {
-              await navigator.share({
-                files: [file],
-                title: "Scrapo Archive",
-              });
-              return;
-            } catch {
-              console.log("Share failed, falling back to download");
-            }
-          }
-        }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `scrapo-archive-${Date.now()}.png`;
-        link.click();
-        URL.revokeObjectURL(url);
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png");
       });
     } catch (err) {
       console.error("Export failed", err);
+      return null;
     }
+  };
+
+  const handleShare = async () => {
+    const blob = await generateCanvasBlob();
+    if (!blob) return;
+
+    const file = new File([blob], "scrapo-archive.png", { type: "image/png" });
+    if (navigator.share && typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Scrapo Archive",
+        });
+        return;
+      } catch {
+        console.log("Share failed, falling back to download");
+      }
+    }
+    await handleDownload();
+  };
+
+  const handleDownload = async () => {
+    const blob = await generateCanvasBlob();
+    if (!blob) return;
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `scrapo-archive-${Date.now()}.png`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (!isOpen) return null;
@@ -145,23 +199,26 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
             {step === "select" ? (
               <div className="space-y-4">
                 <p className="text-[10px] text-center text-white/40 mb-8 font-courier uppercase tracking-[0.2em]">
-                  Select up to 4 lines for the archive
+                  Select up to 4 lines to curate
                 </p>
-                {lines.map((line: string, idx: number) => (
-                  <motion.div
-                    key={idx}
-                    onClick={() => toggleLine(idx)}
-                    whileTap={{ scale: 0.98 }}
-                    className={`p-4 rounded-xl cursor-pointer border transition-all duration-300 ${selectedLines.includes(idx)
-                      ? "bg-white/10 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.03)]"
-                      : "bg-white/5 border-transparent hover:bg-white/[0.07]"
-                      }`}
-                  >
-                    <p className={`font-playfair text-base leading-relaxed ${selectedLines.includes(idx) ? "text-white italic" : "text-white/60"}`}>
-                      {line}
-                    </p>
-                  </motion.div>
-                ))}
+                {lines.map((line: string, idx: number) => {
+                  const isSelected = selectedLines.some(l => l.originalIndex === idx);
+                  return (
+                    <motion.div
+                      key={idx}
+                      onClick={() => toggleLine(idx, line)}
+                      whileTap={{ scale: 0.98 }}
+                      className={`p-4 rounded-xl cursor-pointer border transition-all duration-300 ${isSelected
+                        ? "bg-white/10 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.03)]"
+                        : "bg-white/5 border-transparent hover:bg-white/[0.07]"
+                        }`}
+                    >
+                      <p className={`font-playfair text-base leading-relaxed ${isSelected ? "text-white italic" : "text-white/60"}`}>
+                        {line}
+                      </p>
+                    </motion.div>
+                  );
+                })}
               </div>
             ) : (
               <div className="flex flex-col items-center gap-8">
@@ -186,6 +243,15 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                   {selectedTheme === 3 && (
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
                   )}
+                  {selectedTheme === 4 && (
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-[#FF00FF]/10 blur-[100px] rounded-full pointer-events-none" />
+                  )}
+                  {selectedTheme === 5 && (
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_100%)] pointer-events-none" />
+                  )}
+                  {selectedTheme === 7 && (
+                    <div className="absolute top-10 left-10 w-64 h-64 bg-[#FF4D4D]/10 blur-[80px] rounded-full pointer-events-none" />
+                  )}
 
                   {/* Top Metadata */}
                   <div className="flex justify-between items-center w-full px-8 pt-8 z-10">
@@ -201,15 +267,15 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                   <div className="flex-1 flex flex-col justify-center items-center px-10 py-12 text-center z-10 relative">
                     <QuoteIcon className={`w-8 h-8 opacity-[0.07] absolute top-6 left-8 -translate-y-1/2 ${currentTheme.textPrimary}`} />
 
-                    <div className="space-y-6 w-full">
-                      {selectedLines.map((i: number) => (
-                        <p
-                          key={i}
-                          className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide ${currentTheme.textPrimary}`}
+                    <div className="space-y-6 w-full relative z-20">
+                      {selectedLines.map((lineObj) => (
+                        <input
+                          key={lineObj.originalIndex}
+                          value={lineObj.text}
+                          onChange={(e) => handleLineEdit(lineObj.originalIndex, e.target.value)}
+                          className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide text-center w-full bg-transparent outline-none ${currentTheme.textPrimary}`}
                           style={{ textShadow: currentTheme.emboss, fontWeight: 600 }}
-                        >
-                          {lines[i]}
-                        </p>
+                        />
                       ))}
                     </div>
 
@@ -268,16 +334,25 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
               <>
                 <button
                   onClick={() => setStep("select")}
-                  className="flex-1 py-4 border border-white/10 text-white/70 font-cinzel tracking-widest uppercase text-xs rounded-lg hover:bg-white/5 hover:text-white transition-colors"
+                  className="flex-1 py-4 border border-white/10 text-white/70 font-cinzel tracking-widest uppercase text-xs rounded-lg hover:bg-white/5 hover:text-white transition-colors flex items-center justify-center"
                 >
-                  Back
+                  <X className="w-4 h-4" />
                 </button>
-                <button
-                  onClick={handleShare}
-                  className="flex-[2] py-4 bg-white text-black font-cinzel tracking-[0.2em] uppercase text-xs font-bold rounded-lg hover:bg-gray-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center gap-2"
-                >
-                  Share to Story <Share2 className="w-4 h-4 ml-1" />
-                </button>
+                <div className="flex-[3] flex gap-2">
+                  <button
+                    onClick={handleDownload}
+                    className="flex-[1] py-4 bg-white/10 text-white font-cinzel tracking-[0.2em] uppercase text-xs font-bold rounded-lg hover:bg-white/20 transition-all flex items-center justify-center"
+                    title="Download Image"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="flex-[2] py-4 bg-white text-black font-cinzel tracking-[0.1em] uppercase text-[10px] md:text-xs font-bold rounded-lg hover:bg-gray-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all flex items-center justify-center gap-2"
+                  >
+                    Share Note <Share2 className="w-4 h-4 ml-1" />
+                  </button>
+                </div>
               </>
             )}
           </div>

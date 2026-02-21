@@ -31,13 +31,13 @@ export default function ChatMessage({
     >
       <div
         className={`relative max-w-[85%] md:max-w-[80%] py-4 px-5 rounded-2xl ${isBot
-            ? "bg-transparent text-[#1A1A1A]"
-            : "bg-[#1A1A1A]/5 text-[#1A1A1A] shadow-sm ml-auto"
+          ? "bg-transparent text-[#F5F5F5]"
+          : "bg-white/5 backdrop-blur-md border border-white/10 text-[#F5F5F5] shadow-lg ml-auto"
           }`}
       >
         {/* Decorative dot for bot messages to anchor them like an author's mark */}
         {isBot && (
-          <div className="absolute -left-1 top-6 w-1.5 h-1.5 rounded-full bg-[#9C6A6A]/40" />
+          <div className="absolute -left-1 top-6 w-1 h-3 rounded-full bg-amber-500/50 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
         )}
 
         {/* Message Content */}
@@ -50,8 +50,8 @@ export default function ChatMessage({
         </div>
 
         {/* Timestamp & Actions */}
-        <div className={`flex items-center justify-between mt-4 gap-4 min-h-[24px] ${isBot ? "border-t border-[#1A1A1A]/5 pt-3" : ""}`}>
-          <span className="font-courier text-[9px] text-[#1A1A1A]/40 uppercase tracking-widest">
+        <div className={`flex items-center justify-between mt-4 gap-4 min-h-[24px] ${isBot ? "border-t border-white/5 pt-3" : ""}`}>
+          <span className="font-courier text-[9px] text-[#F5F5F5]/40 uppercase tracking-widest">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -65,7 +65,7 @@ export default function ChatMessage({
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={() => onShare(message.content)}
-                  className="p-1.5 text-[#1A1A1A]/40 hover:text-[#1A1A1A] hover:bg-[#1A1A1A]/5 rounded-lg transition-colors"
+                  className="p-1.5 text-[#F5F5F5]/40 hover:text-[#F5F5F5] hover:bg-white/10 rounded-lg transition-colors"
                   title="Share Archive Card"
                 >
                   <Share2 className="w-4 h-4 stroke-[1.5px]" />
@@ -76,7 +76,7 @@ export default function ChatMessage({
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={() => onSave(message.content)}
-                  className="p-1.5 text-[#1A1A1A]/40 hover:text-[#9C6A6A] hover:bg-[#9C6A6A]/10 rounded-lg transition-colors"
+                  className="p-1.5 text-[#F5F5F5]/40 hover:text-amber-400 hover:bg-amber-400/10 rounded-lg transition-colors"
                   title="Archive"
                 >
                   <Heart className="w-4 h-4 stroke-[1.5px]" />
@@ -86,7 +86,7 @@ export default function ChatMessage({
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={() => onExport(message.content)}
-                  className="p-1.5 text-[#1A1A1A]/40 hover:text-[#1A1A1A] hover:bg-[#1A1A1A]/5 rounded-lg transition-colors"
+                  className="p-1.5 text-[#F5F5F5]/40 hover:text-[#F5F5F5] hover:bg-white/10 rounded-lg transition-colors"
                   title="Export PDF"
                 >
                   <Download className="w-4 h-4 stroke-[1.5px]" />
@@ -95,7 +95,7 @@ export default function ChatMessage({
               <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={() => navigator.clipboard.writeText(message.content)}
-                className="p-1.5 text-[#1A1A1A]/40 hover:text-[#1A1A1A] hover:bg-[#1A1A1A]/5 rounded-lg transition-colors"
+                className="p-1.5 text-[#F5F5F5]/40 hover:text-[#F5F5F5] hover:bg-white/10 rounded-lg transition-colors"
                 title="Copy"
               >
                 <Copy className="w-4 h-4 stroke-[1.5px]" />

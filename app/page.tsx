@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Moon, BookOpen, Loader2 } from "lucide-react";
+import { Send, Sparkles, BookOpen, Loader2 } from "lucide-react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, addDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
@@ -221,7 +221,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col items-center bg-[#F5F5DC] overflow-hidden relative">
+    <div className="h-[100dvh] w-full flex flex-col items-center bg-[#0D0E12] overflow-hidden relative">
       <div className="w-full max-w-2xl h-full flex flex-col relative z-10">
 
         {/* Minimal Header */}
@@ -232,10 +232,10 @@ export default function HomePage() {
           transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
         >
           <div className="flex flex-col">
-            <h1 className="font-playfair text-xl text-[#1A1A1A] font-medium tracking-wide">
+            <h1 className="font-playfair text-xl text-[#F5F5F5] font-medium tracking-wide">
               Scrapo
             </h1>
-            <p className="font-courier text-[10px] text-[#9C6A6A] tracking-[0.2em] uppercase mt-1">
+            <p className="font-courier text-[10px] text-[#F5F5F5]/40 tracking-[0.2em] uppercase mt-1">
               {user?.penName || "Unknown"}
             </p>
           </div>
@@ -243,16 +243,16 @@ export default function HomePage() {
           <div className="flex gap-3">
             <motion.button
               onClick={toggleMood}
-              className="group p-2 flex items-center justify-center text-[#1A1A1A]/40 hover:text-[#9C6A6A] transition-colors"
+              className="group p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
               whileTap={{ scale: 0.92 }}
               title={`Mood: ${currentMood}`}
             >
-              <Moon className="w-5 h-5 stroke-[1.5px] group-hover:fill-[#9C6A6A]/10" />
+              <Sparkles className="w-5 h-5 stroke-[1.5px] group-hover:fill-white/10" />
             </motion.button>
 
             <motion.button
               onClick={() => router.push("/history")}
-              className="p-2 flex items-center justify-center text-[#1A1A1A]/40 hover:text-[#9C6A6A] transition-colors"
+              className="p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
               whileTap={{ scale: 0.92 }}
               title="Archive"
             >
@@ -290,12 +290,12 @@ export default function HomePage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
-                <div className="flex items-center gap-2 px-4 py-3 bg-[#1A1A1A]/5 rounded-2xl">
+                <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
                   <div className="flex gap-1.5">
                     {[0, 1, 2].map((i) => (
                       <motion.div
                         key={i}
-                        className="w-1.5 h-1.5 bg-[#9C6A6A] rounded-full"
+                        className="w-1.5 h-1.5 bg-[#F5F5F5]/70 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
                         animate={{ y: [0, -3, 0] }}
                         transition={{
                           duration: 0.8,
@@ -322,10 +322,10 @@ export default function HomePage() {
           transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
         >
           {/* Subtle gradient to wash out the text behind the dock */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F5F5DC] via-[#F5F5DC]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0E12] via-[#0D0E12]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
 
           <div className="px-5 pb-6 pt-2 pointer-events-auto">
-            <div className="flex items-end gap-3 bg-white/40 backdrop-blur-xl border border-[#1A1A1A]/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)]">
+            <div className="flex items-end gap-3 bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -333,14 +333,14 @@ export default function HomePage() {
                 onKeyDown={handleKeyDown}
                 placeholder="Whisper a prompt..."
                 disabled={isGenerating}
-                className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
+                className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#F5F5F5] placeholder:text-[#F5F5F5]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
                 rows={1}
               />
 
               <motion.button
                 onClick={handleSend}
                 disabled={!input.trim() || isGenerating}
-                className="mb-1 mr-1 relative p-3.5 bg-[#1A1A1A] text-[#F5F5DC] rounded-xl flex items-center justify-center shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                className="mb-1 mr-1 relative p-3.5 bg-white text-black rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 transition-shadow hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
                 whileTap={{ scale: 0.92 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
