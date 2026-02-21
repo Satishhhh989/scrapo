@@ -287,147 +287,11 @@ export default function HomePage() {
 
   return (
     <div className="h-[100dvh] w-full flex flex-col items-center bg-[#0D0E12] overflow-hidden relative">
-      <div className="w-full max-w-[1200px] h-full flex relative z-10 px-4 md:px-8">
-        {/* Left Spacer for Perfect Centering on Desktop */}
-        <div className="hidden lg:block w-72 shrink-0" />
+      <div className="w-full max-w-5xl h-full flex relative z-10 px-4 md:px-8 gap-12 mx-auto">
 
-        {/* Main Chat Column */}
-        <div className="flex-1 w-full max-w-2xl h-full flex flex-col relative z-10 mx-auto">
-          {/* Minimal Header */}
-          <motion.header
-            className="flex-shrink-0 px-6 pt-12 pb-4 flex justify-between items-center z-20"
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
-          >
-            <div className="flex flex-col">
-              <h1 className="font-playfair text-xl text-[#F5F5F5] font-medium tracking-wide">
-                Scrapo
-              </h1>
-              <p className="font-courier text-[10px] text-[#F5F5F5]/40 tracking-[0.2em] uppercase mt-1">
-                {user?.penName || "Unknown"}
-              </p>
-            </div>
-
-            <div className="flex gap-3 lg:hidden">
-              <motion.button
-                onClick={toggleMood}
-                className="group p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
-                whileTap={{ scale: 0.92 }}
-                title={`Mood: ${currentMood}`}
-              >
-                <Sparkles className="w-5 h-5 stroke-[1.5px] group-hover:fill-white/10" />
-              </motion.button>
-
-              <motion.button
-                onClick={() => router.push("/history")}
-                className="p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
-                whileTap={{ scale: 0.92 }}
-                title="Archive"
-              >
-                <BookOpen className="w-5 h-5 stroke-[1.5px]" />
-              </motion.button>
-            </div>
-          </motion.header>
-
-          {/* scrollable messages area */}
-          <div id="chat-container" className="flex-1 overflow-y-auto px-6 pt-4 pb-40 scrollbar-hide space-y-10">
-            <AnimatePresence mode="popLayout">
-              {messages.map((msg) => (
-                <ChatMessage
-                  key={msg.id}
-                  message={msg}
-                  onSave={msg.role === "assistant" ? handleSavePoem : undefined}
-                  onExport={msg.role === "assistant" ? handleExportPoem : undefined}
-                  onShare={msg.role === "assistant" ? handleShareClick : undefined}
-                  onGenerateAction={msg.role === "assistant" ? handleGenerateAction : undefined}
-                />
-              ))}
-
-              {streamingMessage && (
-                <ChatMessage
-                  key="streaming"
-                  message={streamingMessage}
-                  isStreaming
-                />
-              )}
-
-              {isGenerating && !streamingMessage && (
-                <motion.div
-                  className="flex justify-start opacity-60 ml-4"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 0.6, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                >
-                  <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-                    <div className="flex gap-1.5">
-                      {[0, 1, 2].map((i) => (
-                        <motion.div
-                          key={i}
-                          className="w-1.5 h-1.5 bg-[#F5F5F5]/70 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                          animate={{ y: [0, -3, 0] }}
-                          transition={{
-                            duration: 0.8,
-                            repeat: Infinity,
-                            delay: i * 0.15,
-                            ease: "easeInOut"
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div ref={messagesEndRef} className="h-4" />
-          </div>
-
-          {/* Floating Dock Input area mapping the thumb zone perfectly */}
-          <motion.div
-            className="absolute bottom-0 left-0 right-0 w-full z-40 pb-safe pointer-events-none"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
-          >
-            {/* Subtle gradient to wash out the text behind the dock */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0E12] via-[#0D0E12]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
-
-            <div className="px-5 pb-6 pt-2 pointer-events-auto">
-              <div className="flex items-end gap-3 bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Whisper a prompt..."
-                  disabled={isGenerating}
-                  className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#F5F5F5] placeholder:text-[#F5F5F5]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
-                  rows={1}
-                />
-
-                <motion.button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isGenerating}
-                  className="mb-1 mr-1 relative p-3.5 bg-white text-black rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 transition-shadow hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
-                  whileTap={{ scale: 0.92 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                >
-                  {isGenerating ? (
-                    <Loader2 className="w-5 h-5 animate-spin stroke-[2px]" />
-                  ) : (
-                    <Send className="w-5 h-5 stroke-[2px] translate-x-[1px] translate-y-[1px]" />
-                  )}
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="hidden lg:flex flex-col w-72 border-l border-white/5 pl-8 py-12 shrink-0 h-full overflow-y-auto !scrollbar-hide z-10">
-          <h3 className="font-playfair text-white/90 text-xl tracking-wide mb-8">Sanctuary</h3>
+        {/* Left Sidebar (Sanctuary) */}
+        <div className="hidden lg:flex flex-col w-64 pt-16 pb-8 shrink-0 h-full overflow-y-auto !scrollbar-hide z-10 border-r border-white/5 pr-8">
+          <h3 className="font-playfair text-white/90 text-2xl tracking-wide mb-10">Sanctuary</h3>
 
           <div className="space-y-6">
             <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl shadow-lg">
@@ -468,6 +332,140 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Main Chat Column */}
+        <div className="flex-1 w-full max-w-2xl h-full flex flex-col relative z-20 mx-auto">
+          {/* Minimal Header */}
+          <motion.header
+            className="flex-shrink-0 pt-12 pb-4 flex justify-between items-center z-20"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
+          >
+            <div className="flex flex-col">
+              <h1 className="font-playfair text-xl text-[#F5F5F5] font-medium tracking-wide">
+                Scrapo
+              </h1>
+              <p className="font-courier text-[10px] text-[#F5F5F5]/40 tracking-[0.2em] uppercase mt-1">
+                {user?.penName || "Unknown"}
+              </p>
+            </div>
+
+            <div className="flex gap-3 lg:hidden">
+              <motion.button
+                onClick={toggleMood}
+                className="group p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
+                whileTap={{ scale: 0.92 }}
+                title={`Mood: ${currentMood}`}
+              >
+                <Sparkles className="w-5 h-5 stroke-[1.5px] group-hover:fill-white/10" />
+              </motion.button>
+
+              <motion.button
+                onClick={() => router.push("/history")}
+                className="p-2 flex items-center justify-center text-[#F5F5F5]/40 hover:text-[#F5F5F5] transition-colors"
+                whileTap={{ scale: 0.92 }}
+                title="Archive"
+              >
+                <BookOpen className="w-5 h-5 stroke-[1.5px]" />
+              </motion.button>
+            </div>
+          </motion.header>
+
+          {/* scrollable messages area */}
+          <div id="chat-container" className="flex-1 overflow-y-auto pt-4 pb-48 scrollbar-hide space-y-10">
+            <AnimatePresence mode="popLayout">
+              {messages.map((msg) => (
+                <ChatMessage
+                  key={msg.id}
+                  message={msg}
+                  onSave={msg.role === "assistant" ? handleSavePoem : undefined}
+                  onExport={msg.role === "assistant" ? handleExportPoem : undefined}
+                  onShare={msg.role === "assistant" ? handleShareClick : undefined}
+                  onGenerateAction={msg.role === "assistant" ? handleGenerateAction : undefined}
+                />
+              ))}
+
+              {streamingMessage && (
+                <ChatMessage
+                  key="streaming"
+                  message={streamingMessage}
+                  isStreaming
+                />
+              )}
+
+              {isGenerating && !streamingMessage && (
+                <motion.div
+                  className="flex justify-start opacity-60 mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 0.6, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <div className="flex items-center gap-2 px-4 py-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+                    <div className="flex gap-1.5">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-1.5 h-1.5 bg-[#F5F5F5]/70 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+                          animate={{ y: [0, -3, 0] }}
+                          transition={{
+                            duration: 0.8,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div ref={messagesEndRef} className="h-4" />
+          </div>
+
+          {/* Floating Dock Input area mapping the thumb zone perfectly */}
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 w-full z-40 pb-safe pointer-events-none"
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
+          >
+            {/* Subtle gradient to wash out the text behind the dock */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0E12] via-[#0D0E12]/90 to-transparent -z-10 h-32 -top-8 pointer-events-none" />
+
+            <div className="pb-8 pt-2 pointer-events-auto">
+              <div className="flex items-end gap-3 bg-white/[0.03] backdrop-blur-2xl border border-white/10 p-2 rounded-[1.5rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] mx-auto">
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Whisper a prompt..."
+                  disabled={isGenerating}
+                  className="flex-1 px-4 py-3 bg-transparent font-courier text-[15px] leading-relaxed text-[#F5F5F5] placeholder:text-[#F5F5F5]/30 focus:outline-none resize-none min-h-[48px] max-h-[120px] disabled:opacity-50 !scrollbar-hide"
+                  rows={1}
+                />
+
+                <motion.button
+                  onClick={handleSend}
+                  disabled={!input.trim() || isGenerating}
+                  className="mb-1 mr-1 relative p-3.5 bg-white text-black rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0 transition-shadow hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]"
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  {isGenerating ? (
+                    <Loader2 className="w-5 h-5 animate-spin stroke-[2px]" />
+                  ) : (
+                    <Send className="w-5 h-5 stroke-[2px] translate-x-[1px] translate-y-[1px]" />
+                  )}
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         <ShareModal

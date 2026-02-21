@@ -52,8 +52,8 @@ export default function ChatMessage({
         </div>
 
         {/* Timestamp & Actions */}
-        <div className={`flex items-center justify-between mt-4 gap-4 min-h-[24px] ${isBot ? "border-t border-white/5 pt-3" : ""}`}>
-          <span className="font-courier text-[9px] text-[#F5F5F5]/40 uppercase tracking-widest">
+        <div className={`flex flex-wrap items-center mt-3 gap-y-3 gap-x-4 min-h-[24px] ${isBot ? "border-t border-white/5 pt-3" : ""}`}>
+          <span className="font-courier text-[9px] text-[#F5F5F5]/40 uppercase tracking-widest mr-auto">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -62,11 +62,11 @@ export default function ChatMessage({
 
           {/* Action Buttons */}
           {isBot && !isStreaming && (
-            <div className="flex w-full justify-between items-center flex-wrap gap-2">
+            <div className="flex items-center flex-wrap gap-2">
 
               {/* Native AI Generators */}
               {onGenerateAction && (
-                <div className="flex gap-1 items-center mr-auto">
+                <div className="flex items-center gap-1">
                   <motion.button
                     whileTap={{ scale: 0.92 }}
                     onClick={() => onGenerateAction("expand", message.content)}
@@ -97,8 +97,13 @@ export default function ChatMessage({
                 </div>
               )}
 
+              {/* Minimal Divider */}
+              {onGenerateAction && (
+                <div className="hidden sm:block w-px h-3.5 bg-white/10 mx-1" />
+              )}
+
               {/* Standard Actions */}
-              <div className="flex gap-1.5">
+              <div className="flex items-center gap-1.5">
                 {onShare && (
                   <motion.button
                     whileTap={{ scale: 0.92 }}
