@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Share2, Image as ImageIcon, Download } from "lucide-react";
 import html2canvas from "html2canvas";
 import { ShareTheme } from "@/lib/types";
+import { parsePoetryMarkdown } from "@/lib/utils";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
   const [step, setStep] = useState<"select" | "preview">("select");
   const [selectedLines, setSelectedLines] = useState<{ originalIndex: number; text: string }[]>([]);
   const [selectedTheme, setSelectedTheme] = useState(0);
+  const [selectedFontIndex, setSelectedFontIndex] = useState(0);
   const [aspectRatio, setAspectRatio] = useState<"poster" | "square">("poster");
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -131,7 +133,27 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
     }
   ];
 
+  const fonts = [
+    { name: "Playfair", variable: "var(--font-playfair)" },
+    { name: "Cinzel", variable: "var(--font-cinzel)" },
+    { name: "Courier", variable: "var(--font-courier)" },
+    { name: "Cormorant", variable: "var(--font-cormorant)" },
+    { name: "Lora", variable: "var(--font-lora)" },
+    { name: "Merriweather", variable: "var(--font-merriweather)" },
+    { name: "EB Garamond", variable: "var(--font-eb-garamond)" },
+    { name: "Spectral", variable: "var(--font-spectral)" },
+    { name: "Space Mono", variable: "var(--font-space-mono)" },
+    { name: "Bodoni", variable: "var(--font-bodoni)" },
+    { name: "Baskerville", variable: "var(--font-libre)" },
+    { name: "Alice", variable: "var(--font-alice)" },
+    { name: "Fraunces", variable: "var(--font-fraunces)" },
+    { name: "Inconsolata", variable: "var(--font-inconsolata)" },
+    { name: "Outfit", variable: "var(--font-outfit)" },
+    { name: "Special Elite", variable: "var(--font-special-elite)" },
+  ];
+
   const currentTheme: ShareTheme = themes[selectedTheme];
+  const currentFont = fonts[selectedFontIndex];
 
   const toggleLine = (index: number, text: string) => {
     if (selectedLines.find((l) => l.originalIndex === index)) {
@@ -241,9 +263,10 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                         : "bg-white/5 border-transparent hover:bg-white/[0.07]"
                         }`}
                     >
-                      <p className={`font-playfair text-base leading-relaxed ${isSelected ? "text-white italic" : "text-white/60"}`}>
-                        {line}
-                      </p>
+                      <p
+                        className={`font-playfair text-base leading-relaxed ${isSelected ? "text-white italic" : "text-white/60"}`}
+                        dangerouslySetInnerHTML={{ __html: parsePoetryMarkdown(line) }}
+                      />
                     </motion.div>
                   );
                 })}
@@ -318,11 +341,10 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                           contentEditable
                           suppressContentEditableWarning
                           onBlur={(e) => handleLineEdit(lineObj.originalIndex, e.currentTarget.textContent || "")}
-                          className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide text-center w-full bg-transparent outline-none break-words whitespace-pre-wrap cursor-text focus:bg-white/5 focus:rounded-lg transition-colors px-2 py-1 ${currentTheme.textPrimary}`}
-                          style={{ textShadow: currentTheme.emboss, fontWeight: 600 }}
-                        >
-                          {lineObj.text}
-                        </div>
+                          className={`text-xl md:text-2xl leading-[2.2] tracking-wide text-center w-full bg-transparent outline-none break-words whitespace-pre-wrap cursor-text focus:bg-white/5 focus:rounded-lg transition-colors px-2 py-1 ${currentTheme.textPrimary}`}
+                          style={{ textShadow: currentTheme.emboss, fontWeight: 600, fontFamily: currentFont.variable }}
+                          dangerouslySetInnerHTML={{ __html: parsePoetryMarkdown(lineObj.text) }}
+                        />
                       ))}
                     </div>
 
@@ -375,6 +397,21 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
                       className={`w-12 h-12 rounded-full ${t.bg} border border-white/10 ${selectedTheme === i ? "ring-2 ring-white ring-offset-2 ring-offset-[#0A0A0A] scale-110" : "opacity-60 hover:opacity-100"} shadow-lg transition-all duration-300 flex-shrink-0`}
                       title={t.name}
                     />
+                  ))}
+                </div>
+
+                {/* Font Selector */}
+                <div className="flex gap-3 overflow-x-auto w-full max-w-full pb-4 px-4 scrollbar-hide scroll-smooth">
+                  {fonts.map((f, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedFontIndex(i)}
+                      className={`px-4 py-2 rounded-full border whitespace-nowrap transition-all duration-300 text-sm flex-shrink-0 ${selectedFontIndex === i ? "bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)]" : "bg-white/5 border-white/10 text-white/50 hover:text-white"}`}
+                      style={{ fontFamily: f.variable }}
+                      title={f.name}
+                    >
+                      {f.name}
+                    </button>
                   ))}
                 </div>
               </div>
