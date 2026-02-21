@@ -269,13 +269,16 @@ export default function ShareModal({ isOpen, onClose, content, penName = "The Po
 
                     <div className="space-y-6 w-full relative z-20">
                       {selectedLines.map((lineObj) => (
-                        <input
+                        <div
                           key={lineObj.originalIndex}
-                          value={lineObj.text}
-                          onChange={(e) => handleLineEdit(lineObj.originalIndex, e.target.value)}
-                          className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide text-center w-full bg-transparent outline-none ${currentTheme.textPrimary}`}
+                          contentEditable
+                          suppressContentEditableWarning
+                          onBlur={(e) => handleLineEdit(lineObj.originalIndex, e.currentTarget.textContent || "")}
+                          className={`font-playfair text-xl md:text-2xl leading-[2.2] tracking-wide text-center w-full bg-transparent outline-none break-words whitespace-pre-wrap cursor-text focus:bg-white/5 focus:rounded-lg transition-colors px-2 py-1 ${currentTheme.textPrimary}`}
                           style={{ textShadow: currentTheme.emboss, fontWeight: 600 }}
-                        />
+                        >
+                          {lineObj.text}
+                        </div>
                       ))}
                     </div>
 
